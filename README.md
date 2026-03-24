@@ -29,8 +29,8 @@ Make sure you have the following installed:
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/your-username/your-repo-name.git
-cd your-repo-name
+git clone https://github.com/SyazwaniIzzati/test-syazwani.git
+cd test-syazwani
 ```
 
 ### 2. Install PHP Dependencies
