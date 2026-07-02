@@ -2,27 +2,47 @@
   <AuthenticatedLayout>
     <Header title="Tasks for Today" />
 
-    <div class="max-w-7xl mx-auto mt-8 space-y-6 px-6">
-      <div v-if="taskList.length === 0" class="text-center text-gray-500">
-        No tasks for today!
-      </div>
-
-      <div v-for="task in taskList" :key="task.id" class="bg-white shadow rounded-lg p-4 flex justify-between items-center">
-        <div>
-          <h2 class="text-lg font-semibold">{{ task.title }}</h2>
-          <p class="text-gray-600">{{ task.description }}</p>
-          <p class="text-gray-500 text-sm">Scheduled: {{ formatDate(task.scheduled_time) }}</p>
-          <p class="text-gray-500 text-sm">Time to complete: {{ formatDate(task.time_to_complete) }}</p>
-          <p class="text-gray-500 text-sm">Priority: {{ task.priority }}</p>
+    <div class="min-h-screen bg-gray-50">
+      <div class="max-w-7xl mx-auto pt-8 pb-12 space-y-4 px-6">
+        <div v-if="taskList.length === 0" class="text-center text-gray-500">
+          No tasks for today!
         </div>
 
-        <div>
-          <button 
-            @click="toggleComplete(task)"
-            class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition"
-          >
-            {{ task.is_completed ? 'Completed' : 'Mark Complete' }}
-          </button>
+        <div
+          v-for="task in taskList"
+          :key="task.id"
+          class="bg-slate-50 hover:bg-white border-l-4 shadow-sm hover:shadow-md rounded-lg p-4 flex justify-between items-center transition-all"
+          :class="{
+              'border-l-green-500': task.priority === 'low',
+              'border-l-yellow-500': task.priority === 'medium',
+              'border-l-red-500': task.priority === 'high'
+          }"
+        >
+          <div>
+            <h2 class="text-lg font-semibold text-gray-800">{{ task.title }}</h2>
+            <p class="text-gray-600">{{ task.description }}</p>
+            <p class="text-gray-500 text-sm">Scheduled: {{ formatDate(task.scheduled_time) }}</p>
+            <p class="text-gray-500 text-sm">Time to complete: {{ formatDate(task.time_to_complete) }}</p>
+            <p class="text-gray-500 text-sm">
+              Priority:
+              <span :class="{
+                  'text-green-600 font-semibold': task.priority === 'low',
+                  'text-yellow-600 font-semibold': task.priority === 'medium',
+                  'text-red-600 font-semibold': task.priority === 'high'
+              }">
+                {{ task.priority }}
+              </span>
+            </p>
+          </div>
+
+          <div>
+            <button
+              @click="toggleComplete(task)"
+              class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition"
+            >
+              {{ task.is_completed ? 'Completed' : 'Mark Complete' }}
+            </button>
+          </div>
         </div>
       </div>
     </div>

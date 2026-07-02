@@ -6,11 +6,6 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-*/
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -21,20 +16,12 @@ Route::get('/', function () {
     ]);
 });
 
-// Dashboard
-// Route::get('/dashboard', function () {
-//     return Inertia::render('Dashboard');
-// })->middleware(['auth', 'verified'])->name('dashboard');
-
-// Authenticated routes
 Route::middleware('auth')->group(function () {
 
-    // Profile routes
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Task CRUD routes
     Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.index');
     Route::get('/tasks/create', [TaskController::class, 'create'])->name('tasks.create');
     Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
@@ -42,7 +29,6 @@ Route::middleware('auth')->group(function () {
     Route::put('/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
     Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
 
-    // Sidebar pages
     Route::get('/tasks/today', [TaskController::class, 'today'])->name('tasks.today');
     Route::get('/tasks/upcoming', [TaskController::class, 'upcoming'])->name('tasks.upcoming');
     Route::get('/tasks/completed', [TaskController::class, 'completed'])->name('tasks.completed');
