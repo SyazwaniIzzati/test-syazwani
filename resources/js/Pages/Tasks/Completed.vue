@@ -27,8 +27,12 @@ const formatDate = (date) => {
           No completed tasks yet.
         </div>
 
-        <div v-for="task in tasks" :key="task.id"
-          class="bg-slate-50 hover:bg-white border-l-4 border-l-green-500 shadow-sm hover:shadow-md rounded-lg p-4 transition-all flex items-start gap-3">
+        <div v-for="task in tasks" :key="task.id" :class="[
+          'bg-slate-50 hover:bg-white border-l-4 shadow-sm hover:shadow-md rounded-lg p-4 transition-all flex items-start gap-3',
+          task.priority === 'low' ? 'border-l-green-500' :
+            task.priority === 'medium' ? 'border-l-yellow-500' :
+              'border-l-red-500'
+        ]">
           <span class="mt-1 text-green-500 text-xl leading-none">✓</span>
 
           <div class="flex-1">
