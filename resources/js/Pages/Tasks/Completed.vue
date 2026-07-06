@@ -18,41 +18,61 @@ const formatDate = (date) => {
 
 <template>
   <AuthenticatedLayout :user="auth.user">
-    <Header title="Completed Tasks " />
+    <Header title="Completed Tasks" />
 
     <div class="min-h-screen bg-gray-50">
-      <div class="max-w-7xl mx-auto pt-8 pb-12 px-6 space-y-3">
+      <div class="max-w-screen-xl mx-auto pt-10 pb-16 px-8 lg:px-12">
 
-        <div v-if="tasks.length === 0" class="text-center text-gray-500">
-          No completed tasks yet.
+        <!-- Page intro -->
+        <div class="mb-8 border-b border-gray-200 pb-4">
+          <p class="text-sm text-gray-500 mt-1">
+            {{ tasks.length }} task{{ tasks.length === 1 ? '' : 's' }} completed
+          </p>
         </div>
 
-        <div v-for="task in tasks" :key="task.id" :class="[
-          'bg-slate-50 hover:bg-white border-l-4 shadow-sm hover:shadow-md rounded-lg p-4 transition-all flex items-start gap-3',
-          task.priority === 'low' ? 'border-l-green-500' :
-            task.priority === 'medium' ? 'border-l-yellow-500' :
-              'border-l-red-500'
-        ]">
-          <span class="mt-1 text-green-500 text-xl leading-none">✓</span>
+        <!-- Empty state -->
+        <div v-if="tasks.length === 0"
+          class="text-center text-gray-500 border border-dashed border-gray-300 rounded-lg py-16 bg-white">
+          <p class="text-sm font-medium">No completed tasks yet</p>
+        </div>
 
-          <div class="flex-1">
-            <h2 class="font-bold text-lg text-gray-500 line-through">{{ task.title }}</h2>
-            <p class="text-gray-400">{{ task.description }}</p>
+        <!-- Task list -->
+        <div v-else class="space-y-3">
+          <div v-for="task in tasks" :key="task.id"
+            class="bg-gray-50 border border-gray-200 rounded-md p-5 flex items-start gap-4 transition-colors hover:border-gray-300">
+            <span
+              class="mt-0.5 shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-gray-900 text-white text-xs">
+              ✓
+            </span>
 
-            <div class="text-sm text-gray-400 mt-2 space-y-1">
-              <p>📅 Scheduled: {{ formatDate(task.scheduled_time) }}</p>
-              <p>⏳ Completed by: {{ formatDate(task.time_to_complete) }}</p>
-
-              <p>
-                ⚡ Priority:
-                <span :class="{
-                  'text-green-600 font-semibold': task.priority === 'low',
-                  'text-yellow-600 font-semibold': task.priority === 'medium',
-                  'text-red-600 font-semibold': task.priority === 'high'
-                }">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-3 mb-1">
+                <h2 class="text-base font-semibold text-gray-500 line-through truncate">
+                  {{ task.title }}
+                </h2>
+                <span
+                  class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium uppercase tracking-wide opacity-70"
+                  :class="{
+                    'bg-emerald-50 text-emerald-700 border border-emerald-200': task.priority === 'low',
+                    'bg-amber-50 text-amber-700 border border-amber-200': task.priority === 'medium',
+                    'bg-red-50 text-red-700 border border-red-200': task.priority === 'high'
+                  }">
                   {{ task.priority }}
                 </span>
-              </p>
+              </div>
+
+              <p class="text-sm text-gray-400 mb-3">{{ task.description }}</p>
+
+              <dl class="grid grid-cols-2 gap-x-6 gap-y-1 text-xs text-gray-400 max-w-md">
+                <div class="flex gap-1">
+                  <dt class="font-medium text-gray-400">Scheduled:</dt>
+                  <dd>{{ formatDate(task.scheduled_time) }}</dd>
+                </div>
+                <div class="flex gap-1">
+                  <dt class="font-medium text-gray-400">Completed by:</dt>
+                  <dd>{{ formatDate(task.time_to_complete) }}</dd>
+                </div>
+              </dl>
             </div>
           </div>
         </div>

@@ -30,6 +30,9 @@ const sidebarOpen = ref(false);
           <li>
             <NavLink :href="route('tasks.completed')" :active="route().current('tasks.completed')">Completed</NavLink>
           </li>
+          <li>
+            <NavLink :href="route('tasks.past')" :active="route().current('tasks.passt')">Past Tasks </NavLink>
+          </li>
         </ul>
       </div>
     </aside>
@@ -66,11 +69,11 @@ const sidebarOpen = ref(false);
         <button @click="sidebarOpen = true" class="text-gray-700 text-lg">☰ Menu</button>
       </div>
 
-      <main class="p-0 flex-1">
+      <main class="p-0">
         <slot />
       </main>
 
-      <Footer class="bg-white shadow-inner py-4 text-center text-sm text-gray-500" />
+      <Footer class="bg-white shadow-inner py-4 text-center text-sm text-gray-500 mt-auto" />
 
     </div>
   </div>

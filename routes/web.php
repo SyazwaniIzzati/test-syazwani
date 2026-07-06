@@ -33,6 +33,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/tasks/upcoming', [TaskController::class, 'upcoming'])->name('tasks.upcoming');
     Route::get('/tasks/completed', [TaskController::class, 'completed'])->name('tasks.completed');
     Route::post('/tasks/{task}/complete', [TaskController::class, 'markComplete'])->name('tasks.complete');
+    Route::get('/tasks/past', [TaskController::class, 'pastTasks'])->name('tasks.past');
     Route::get('/dashboard', [TaskController::class, 'dashboard'])->name('dashboard');
 });
 

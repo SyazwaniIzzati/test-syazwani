@@ -60,87 +60,87 @@ class TaskController extends Controller
             abort(403);
         }
 
-        return Inertia::render('Tasks/Edit', [
+        return Inertia::render('Tasks/EditModal', [
             'task' => $task
         ]);
     }
 
     // 5. Update task
     public function update(Request $request, Task $task)
-{
-    if ($task->user_id !== Auth::id()) {
-        abort(403);
+    {
+        if ($task->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'scheduled_time' => 'nullable|date',
+            'time_to_complete' => 'nullable|date',
+            'priority' => 'required|in:low,medium,high',
+            'is_completed' => 'sometimes|boolean',
+        ]);
+
+        $task->update([
+            'title' => $validated['title'],
+            'description' => $validated['description'] ?? null,
+            'scheduled_time' => isset($validated['scheduled_time'])
+                ? date('Y-m-d H:i:s', strtotime($validated['scheduled_time']))
+                : null,
+            'time_to_complete' => isset($validated['time_to_complete'])
+                ? date('Y-m-d H:i:s', strtotime($validated['time_to_complete']))
+                : null,
+            'priority' => $validated['priority'],
+            'is_completed' => $validated['is_completed'] ?? false,
+        ]);
+
+        return redirect()->back()->with('success', 'Task updated successfully!');
     }
-
-    $validated = $request->validate([
-        'title' => 'required|string|max:255',
-        'description' => 'nullable|string',
-        'scheduled_time' => 'nullable|date',
-        'time_to_complete' => 'nullable|date',
-        'priority' => 'required|in:low,medium,high',
-        'is_completed' => 'sometimes|boolean',
-    ]);
-
-    $task->update([
-        'title' => $validated['title'],
-        'description' => $validated['description'] ?? null,
-        'scheduled_time' => isset($validated['scheduled_time'])
-            ? date('Y-m-d H:i:s', strtotime($validated['scheduled_time']))
-            : null,
-        'time_to_complete' => isset($validated['time_to_complete'])
-            ? date('Y-m-d H:i:s', strtotime($validated['time_to_complete']))
-            : null,
-        'priority' => $validated['priority'],
-        'is_completed' => $validated['is_completed'] ?? false,
-    ]);
-
-    return redirect()->back()->with('success', 'Task updated successfully!');
-}
 
     // 6. Delete task
     public function destroy(Task $task)
-{
-    if ($task->user_id !== Auth::id()) {
-        abort(403);
+    {
+        if ($task->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $task->delete();
+
+        return redirect()->back()->with('success', 'Task deleted successfully!');
     }
-
-    $task->delete();
-
-    return redirect()->back()->with('success', 'Task deleted successfully!');
-}
 
     // 7. Tasks for today
     public function today()
-{
-    $todayStart = Carbon::now('Asia/Kuala_Lumpur')->startOfDay();
-    $todayEnd = Carbon::now('Asia/Kuala_Lumpur')->endOfDay();
+    {
+        $todayStart = Carbon::now('Asia/Kuala_Lumpur')->startOfDay();
+        $todayEnd = Carbon::now('Asia/Kuala_Lumpur')->endOfDay();
 
-    $tasks = Task::where('user_id', Auth::id())
-        ->whereBetween('scheduled_time', [$todayStart, $todayEnd])
-        ->where('is_completed', false)
-        ->orderBy('scheduled_time', 'asc')
-        ->get();
+        $tasks = Task::where('user_id', Auth::id())
+            ->whereBetween('scheduled_time', [$todayStart, $todayEnd])
+            ->where('is_completed', false)
+            ->orderBy('scheduled_time', 'asc')
+            ->get();
 
-    return Inertia::render('Tasks/Today', [
-        'tasks' => $tasks
-    ]);
-}
+        return Inertia::render('Tasks/Today', [
+            'tasks' => $tasks
+        ]);
+    }
 
     // 8. Upcoming tasks
     public function upcoming()
-{
-    $todayEnd = Carbon::today()->endOfDay();
+    {
+        $todayEnd = Carbon::today()->endOfDay();
 
-    $tasks = Task::where('user_id', Auth::id())
-        ->where('scheduled_time', '>', $todayEnd)
-        ->where('is_completed', false)
-        ->orderBy('scheduled_time', 'asc')
-        ->get();
+        $tasks = Task::where('user_id', Auth::id())
+            ->where('scheduled_time', '>', $todayEnd)
+            ->where('is_completed', false)
+            ->orderBy('scheduled_time', 'asc')
+            ->get();
 
-    return Inertia::render('Tasks/Upcoming', [
-        'tasks' => $tasks
-    ]);
-}
+        return Inertia::render('Tasks/Upcoming', [
+            'tasks' => $tasks
+        ]);
+    }
 
     // 9. Completed tasks
     public function completed()
@@ -170,28 +170,42 @@ class TaskController extends Controller
     }
 
     public function dashboard()
-{
-    $todayStart = Carbon::now('Asia/Kuala_Lumpur')->startOfDay();
-    $todayEnd = Carbon::now('Asia/Kuala_Lumpur')->endOfDay();
+    {
+        $todayStart = Carbon::now('Asia/Kuala_Lumpur')->startOfDay();
+        $todayEnd = Carbon::now('Asia/Kuala_Lumpur')->endOfDay();
 
-    $todayTasks = Task::where('user_id', Auth::id())
-        ->whereBetween('scheduled_time', [$todayStart, $todayEnd])
-        ->where('is_completed', false)
-        ->get();
+        $todayTasks = Task::where('user_id', Auth::id())
+            ->whereBetween('scheduled_time', [$todayStart, $todayEnd])
+            ->where('is_completed', false)
+            ->get();
 
-    $upcomingTasks = Task::where('user_id', Auth::id())
-        ->where('scheduled_time', '>', $todayEnd)
-        ->where('is_completed', false)
-        ->get();
+        $upcomingTasks = Task::where('user_id', Auth::id())
+            ->where('scheduled_time', '>', $todayEnd)
+            ->where('is_completed', false)
+            ->get();
 
-    $completedTasks = Task::where('user_id', Auth::id())
-        ->where('is_completed', true)
-        ->get();
+        $completedTasks = Task::where('user_id', Auth::id())
+            ->where('is_completed', true)
+            ->get();
 
-    return Inertia::render('Dashboard', [
-        'todayTasks' => $todayTasks,
-        'upcomingTasks' => $upcomingTasks,
-        'completedTasks' => $completedTasks,
-    ]);
-}
+        return Inertia::render('Dashboard', [
+            'todayTasks' => $todayTasks,
+            'upcomingTasks' => $upcomingTasks,
+            'completedTasks' => $completedTasks,
+        ]);
+    }
+
+    public function pastTasks()
+    {
+        $startOfToday = Carbon::now('Asia/Kuala_Lumpur')->startOfDay();
+
+        $tasks = Task::where('user_id', Auth::id())
+            ->where('scheduled_time', '<', $startOfToday)
+            ->orderBy('scheduled_time', 'desc')
+            ->get();
+
+        return Inertia::render('Tasks/Past', [
+            'tasks' => $tasks
+        ]);
+    }
 }
