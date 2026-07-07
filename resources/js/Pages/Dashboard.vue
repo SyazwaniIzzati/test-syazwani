@@ -81,6 +81,32 @@ const circumference = 2 * Math.PI * radius
 const dashOffset = computed(() =>
     circumference - (completionPercent.value / 100) * circumference
 )
+
+const isToday = (date) => {
+    if (!date) return false
+    const d = new Date(date)
+    const now = new Date()
+    return d.getFullYear() === now.getFullYear() &&
+        d.getMonth() === now.getMonth() &&
+        d.getDate() === now.getDate()
+}
+
+const completedToday = computed(() =>
+    props.completedTasks.filter(t => isToday(t.scheduled_time))
+)
+
+const todayTotal = computed(() => props.todayTasks.length + completedToday.value.length)
+
+const todayCompletionPercent = computed(() => {
+    if (todayTotal.value === 0) return 0
+    return Math.round((completedToday.value.length / todayTotal.value) * 100)
+})
+
+const radius2 = 60
+const circumference2 = 2 * Math.PI * radius2
+const dashOffset2 = computed(() =>
+    circumference2 - (todayCompletionPercent.value / 100) * circumference2
+)
 </script>
 
 <template>
@@ -236,19 +262,36 @@ const dashOffset = computed(() =>
                 <div class="bg-white rounded-lg shadow p-4">
                     <h3 class="text-lg font-bold mb-4">Progress Overview</h3>
 
-                    <div class="flex justify-center">
-                        <svg width="160" height="160" viewBox="0 0 160 160">
-                            <circle cx="80" cy="80" :r="radius" fill="none" stroke="#E5E7EB" stroke-width="14" />
-                            <circle cx="80" cy="80" :r="radius" fill="none" stroke="#16A34A" stroke-width="14"
-                                stroke-linecap="round" :stroke-dasharray="circumference" :stroke-dashoffset="dashOffset"
-                                transform="rotate(-90 80 80)" />
-                            <text x="80" y="76" text-anchor="middle" font-size="28" font-weight="bold" fill="#111827">
-                                {{ completionPercent }}%
-                            </text>
-                            <text x="80" y="96" text-anchor="middle" font-size="11" fill="#6B7280">
-                                Completed
-                            </text>
-                        </svg>
+                    <div class="flex justify-center gap-4">
+                        <!-- Overall -->
+                        <div class="flex flex-col items-center">
+                            <svg width="140" height="140" viewBox="0 0 160 160">
+                                <circle cx="80" cy="80" :r="radius" fill="none" stroke="#E5E7EB" stroke-width="14" />
+                                <circle cx="80" cy="80" :r="radius" fill="none" stroke="#16A34A" stroke-width="14"
+                                    stroke-linecap="round" :stroke-dasharray="circumference"
+                                    :stroke-dashoffset="dashOffset" transform="rotate(-90 80 80)" />
+                                <text x="80" y="76" text-anchor="middle" font-size="28" font-weight="bold"
+                                    fill="#111827">
+                                    {{ completionPercent }}%
+                                </text>
+                                <text x="80" y="96" text-anchor="middle" font-size="11" fill="#6B7280">Overall</text>
+                            </svg>
+                        </div>
+
+                        <!-- Today -->
+                        <div class="flex flex-col items-center">
+                            <svg width="140" height="140" viewBox="0 0 160 160">
+                                <circle cx="80" cy="80" :r="radius2" fill="none" stroke="#E5E7EB" stroke-width="14" />
+                                <circle cx="80" cy="80" :r="radius2" fill="none" stroke="#2563EB" stroke-width="14"
+                                    stroke-linecap="round" :stroke-dasharray="circumference2"
+                                    :stroke-dashoffset="dashOffset2" transform="rotate(-90 80 80)" />
+                                <text x="80" y="76" text-anchor="middle" font-size="28" font-weight="bold"
+                                    fill="#111827">
+                                    {{ todayCompletionPercent }}%
+                                </text>
+                                <text x="80" y="96" text-anchor="middle" font-size="11" fill="#6B7280">Today</text>
+                            </svg>
+                        </div>
                     </div>
 
                     <div class="mt-4 space-y-2 text-sm">
