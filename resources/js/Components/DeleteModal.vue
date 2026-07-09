@@ -11,8 +11,8 @@ const emit = defineEmits(['close'])
 const deleteTask = () => {
   router.delete(route('tasks.destroy', props.task.id), {
   onSuccess: () => {
-    emit('close')       
-    router.reload()    
+    emit('close') 
+    emit('deleted', props.task.id)         
   }
 })
 }

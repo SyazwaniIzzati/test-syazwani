@@ -34,6 +34,10 @@
                   }">
                   {{ task.priority }}
                 </span>
+                <span v-if="isExpired(task) && !task.is_completed"
+                  class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium uppercase tracking-wide bg-gray-100 text-gray-500 border border-gray-200">
+                  Expired
+                </span>
               </div>
 
               <p class="text-sm text-gray-600 mb-3">{{ task.description }}</p>
@@ -50,32 +54,84 @@
               </dl>
             </div>
 
-            <div class="shrink-0">
-              <button @click="toggleComplete(task)" :disabled="task.is_completed"
-                class="text-sm font-medium px-4 py-2 rounded-md border transition-colors" :class="task.is_completed
+            <div class="shrink-0 flex flex-col gap-2 items-stretch">
+              <button @click="toggleComplete(task)" :disabled="task.is_completed || isExpired(task)"
+                class="text-sm font-medium px-4 py-2 rounded-md border transition-colors" :class="(task.is_completed || isExpired(task))
                   ? 'bg-green-100 text-green-400 border-green-200 cursor-not-allowed'
                   : 'bg-green-700 text-white border-green-700 hover:bg-green-600'">
-                {{ task.is_completed ? 'Completed' : 'Mark Complete' }}
+                {{ task.is_completed ? 'Completed' : (isExpired(task) ? 'Mark Complete' : 'Mark Complete') }}
               </button>
+
+              <div class="flex gap-2">
+                <button @click="openEditModal(task)"
+                  class="text-sm font-medium px-4 py-2 rounded-md border transition-colors bg-white text-gray-700 border-gray-300 hover:bg-gray-50">
+                  Edit
+                </button>
+                <button @click="openDeleteModal(task)"
+                  class="text-sm font-medium px-4 py-2 rounded-md border transition-colors bg-white text-red-600 border-red-200 hover:bg-red-50">
+                  Delete
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
+
+    <EditModal
+      :show="showEditModal"
+      :task="selectedTask"
+      @close="showEditModal = false"
+      @update="handleTaskUpdate"
+    />
+
+    <DeleteModal
+      :show="showDeleteModal"
+      :task="selectedTask"
+      @close="showDeleteModal = false"
+    />
   </AuthenticatedLayout>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { router as Inertia } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import Header from '@/Components/Header.vue';
+import EditModal from '@/Components/EditModal.vue';
+import DeleteModal from '@/Components/DeleteModal.vue';
 
 const props = defineProps({
   tasks: Array
 });
 
 const taskList = ref([...props.tasks]);
+
+const handleTaskUpdate = (updatedTask) => {
+    const index = props.tasks.findIndex(t => t.id === updatedTask.id)
+    if (index !== -1) {
+        props.tasks[index] = { ...updatedTask }
+    }
+}
+
+// Reactive "now" so expired state updates live without a page refresh
+const now = ref(new Date());
+let clockInterval = null;
+
+onMounted(() => {
+  clockInterval = setInterval(() => {
+    now.value = new Date();
+  }, 30000); // check every 30s
+});
+
+onUnmounted(() => {
+  if (clockInterval) clearInterval(clockInterval);
+});
+
+const isExpired = (task) => {
+  if (!task.time_to_complete) return false;
+  return new Date(task.time_to_complete) < now.value;
+};
 
 const toggleComplete = (task) => {
   Inertia.put(route('tasks.update', task.id), {
@@ -87,6 +143,21 @@ const toggleComplete = (task) => {
       Inertia.get(route('tasks.completed'))
     }
   });
+};
+
+// Modal state
+const showEditModal = ref(false);
+const showDeleteModal = ref(false);
+const selectedTask = ref(null);
+
+const openEditModal = (task) => {
+  selectedTask.value = task;
+  showEditModal.value = true;
+};
+
+const openDeleteModal = (task) => {
+  selectedTask.value = task;
+  showDeleteModal.value = true;
 };
 
 const formatDate = (date) => {

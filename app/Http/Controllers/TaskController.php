@@ -173,6 +173,7 @@ class TaskController extends Controller
     {
         $todayStart = Carbon::now('Asia/Kuala_Lumpur')->startOfDay();
         $todayEnd = Carbon::now('Asia/Kuala_Lumpur')->endOfDay();
+        $now = Carbon::now('Asia/Kuala_Lumpur');
 
         $todayTasks = Task::where('user_id', Auth::id())
             ->whereBetween('scheduled_time', [$todayStart, $todayEnd])
@@ -188,19 +189,26 @@ class TaskController extends Controller
             ->where('is_completed', true)
             ->get();
 
+        $pastTasks = Task::where('user_id', Auth::id())
+            ->where('scheduled_time', '<', $now)
+            ->where('is_completed', false)
+            ->orderBy('scheduled_time', 'desc')
+            ->get();
+
         return Inertia::render('Dashboard', [
             'todayTasks' => $todayTasks,
             'upcomingTasks' => $upcomingTasks,
             'completedTasks' => $completedTasks,
+            'pastTasks' => $pastTasks
         ]);
     }
 
     public function pastTasks()
     {
-        $startOfToday = Carbon::now('Asia/Kuala_Lumpur')->startOfDay();
+        $now = Carbon::now('Asia/Kuala_Lumpur');
 
         $tasks = Task::where('user_id', Auth::id())
-            ->where('scheduled_time', '<', $startOfToday)
+            ->where('scheduled_time', '<', $now)
             ->orderBy('scheduled_time', 'desc')
             ->get();
 

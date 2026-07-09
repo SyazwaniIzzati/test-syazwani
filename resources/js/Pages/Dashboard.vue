@@ -8,14 +8,18 @@ import Header from '@/Components/Header.vue'
 const props = defineProps({
     todayTasks: { type: Array, default: () => [] },
     upcomingTasks: { type: Array, default: () => [] },
-    completedTasks: { type: Array, default: () => [] }
+    completedTasks: { type: Array, default: () => [] },
+    pastTasks: { type: Array, default: () => [] },
 })
 
 const showCreate = ref(false)
 
-const totalTasks = computed(() =>
-    props.todayTasks.length + props.upcomingTasks.length + props.completedTasks.length
-)
+const totalTasks = computed(() => {
+    const ids = new Set()
+        ;[...props.todayTasks, ...props.upcomingTasks, ...props.completedTasks, ...props.pastTasks]
+            .forEach(t => ids.add(t.id))
+    return ids.size
+})
 
 const completionPercent = computed(() => {
     if (totalTasks.value === 0) return 0
@@ -26,7 +30,8 @@ const allTasks = computed(() => {
     const today = props.todayTasks.map(t => ({ ...t, status: 'Today' }))
     const upcoming = props.upcomingTasks.map(t => ({ ...t, status: 'Upcoming' }))
     const completed = props.completedTasks.map(t => ({ ...t, status: 'Completed' }))
-    return [...today, ...upcoming, ...completed]
+    const missed = props.pastTasks.map(t => ({ ...t, status: 'Missed' }))
+    return [...today, ...upcoming, ...completed, ...missed]
 })
 
 const search = ref('')
@@ -65,15 +70,16 @@ const formatDate = (date) => {
 }
 
 const statusBadge = (status) => ({
-    Today: 'bg-blue-100 text-blue-700',
+    Today: 'bg-purple-100 text-purple-700',
     Upcoming: 'bg-orange-100 text-orange-700',
-    Completed: 'bg-gray-100 text-gray-600',
+    Completed: 'bg-green-100 text-green-600',
+    Missed: 'bg-red-100 text-red-700',
 }[status] || 'bg-gray-100 text-gray-600')
 
 const priorityBadge = (priority) => ({
-    low: 'bg-green-100 text-green-700',
-    medium: 'bg-yellow-100 text-yellow-700',
-    high: 'bg-red-100 text-red-700',
+    low: 'bg-teal-100 text-teal-700',
+    medium: 'bg-amber-100 text-amber-700',
+    high: 'bg-pink-100 text-pink-700',
 }[priority] || 'bg-gray-100 text-gray-600')
 
 const radius = 60
@@ -95,7 +101,7 @@ const completedToday = computed(() =>
     props.completedTasks.filter(t => isToday(t.scheduled_time))
 )
 
-const todayTotal = computed(() => props.todayTasks.length + completedToday.value.length)
+const todayTotal = computed(() => props.todayTasks.length + completedToday.value.length + props.pastTasks.length)
 
 const todayCompletionPercent = computed(() => {
     if (todayTotal.value === 0) return 0
@@ -143,7 +149,7 @@ const dashOffset2 = computed(() =>
                 </div>
 
                 <div class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition flex items-center gap-4">
-                    <div class="bg-green-100 text-green-600 rounded-lg p-3">
+                    <div class="bg-purple-100 text-purple-600 rounded-lg p-3">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
                             stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -173,7 +179,7 @@ const dashOffset2 = computed(() =>
                 </div>
 
                 <div class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition flex items-center gap-4">
-                    <div class="bg-purple-100 text-purple-600 rounded-lg p-3">
+                    <div class="bg-green-100 text-green-600 rounded-lg p-3">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
                             stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -200,6 +206,7 @@ const dashOffset2 = computed(() =>
                                 <option>Today</option>
                                 <option>Upcoming</option>
                                 <option>Completed</option>
+                                <option>Missed</option>
                             </select>
                             <input v-model="search" type="text" placeholder="Search tasks..."
                                 class="border rounded px-2 py-1 text-sm" />
@@ -304,11 +311,6 @@ const dashOffset2 = computed(() =>
                             <span class="flex items-center gap-2"><span
                                     class="w-2 h-2 rounded-full bg-blue-600"></span>Today</span>
                             <span>{{ todayTasks.length }}</span>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <span class="flex items-center gap-2"><span
-                                    class="w-2 h-2 rounded-full bg-orange-500"></span>Upcoming</span>
-                            <span>{{ upcomingTasks.length }}</span>
                         </div>
                     </div>
 
