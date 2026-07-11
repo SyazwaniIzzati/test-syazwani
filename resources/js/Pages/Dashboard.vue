@@ -35,7 +35,6 @@ const isToday = (date) => {
         d.getDate() === now.getDate()
 }
 
-// Determine date bucket independent of status (Today / Upcoming / Past)
 const getDateCategory = (date) => {
     if (!date) return 'Other'
     if (isToday(date)) return 'Today'
@@ -67,7 +66,6 @@ const filteredTasks = computed(() => {
         } else if (statusFilter.value === 'Missed') {
             matchesFilter = task.status === 'Missed'
         }
-        // 'All' keeps matchesFilter = true
 
         return matchesSearch && matchesFilter
     })
@@ -89,8 +87,6 @@ const goToPage = (page) => {
     if (page < 1 || page > totalPages.value) return
     currentPage.value = page
 }
-
-watch([search, statusFilter], () => { currentPage.value = 1 })
 
 const formatDate = (date) => {
     if (!date) return '-'
@@ -141,6 +137,8 @@ const setFilter = (status) => {
     statusFilter.value = status
     currentPage.value = 1
 }
+
+watch([search, statusFilter], () => { currentPage.value = 1 })
 </script>
 
 <template>
