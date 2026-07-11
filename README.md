@@ -110,4 +110,3 @@ Schema::create('tasks', function (Blueprint $table) {
 ## 👩‍💻 Author
 
 **Nursyazwani Izzati Binti Mohd Salehin**
-Full Stack Web Developer Application Assessment R2
