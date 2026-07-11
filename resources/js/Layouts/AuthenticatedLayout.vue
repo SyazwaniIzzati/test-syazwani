@@ -31,7 +31,7 @@ const sidebarOpen = ref(false);
             <NavLink :href="route('tasks.completed')" :active="route().current('tasks.completed')">Completed</NavLink>
           </li>
           <li>
-            <NavLink :href="route('tasks.past')" :active="route().current('tasks.passt')">Past Tasks </NavLink>
+            <NavLink :href="route('tasks.past')" :active="route().current('tasks.past')">Past Tasks </NavLink>
           </li>
         </ul>
       </div>
