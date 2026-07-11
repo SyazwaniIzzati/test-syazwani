@@ -3,7 +3,7 @@
         <Header title="Past Tasks" />
 
         <div class="bg-slate-50">
-            <div class="max-w-7xl mx-auto pt-8 pb-12 px-8">
+            <div class="max-w-none mx-auto pt-10 pb-16 px-8 lg:px-12">
 
                 <!-- Empty state -->
                 <div v-if="taskList.length === 0"

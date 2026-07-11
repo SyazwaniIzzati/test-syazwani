@@ -177,6 +177,7 @@ class TaskController extends Controller
 
         $todayTasks = Task::where('user_id', Auth::id())
             ->whereBetween('scheduled_time', [$todayStart, $todayEnd])
+            ->where('scheduled_time', '>', $now)
             ->where('is_completed', false)
             ->get();
 

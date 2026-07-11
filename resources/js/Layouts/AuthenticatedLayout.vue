@@ -59,6 +59,10 @@ const sidebarOpen = ref(false);
             <NavLink :href="route('tasks.completed')" :active="route().current('tasks.completed')"
               @click="sidebarOpen = false">Completed</NavLink>
           </li>
+          <li>
+            <NavLink :href="route('tasks.past')" :active="route().current('tasks.past')"
+              @click="sidebarOpen = false">Past Tasks </NavLink>
+          </li>
         </ul>
       </div>
     </div>

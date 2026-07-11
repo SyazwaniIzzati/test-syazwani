@@ -24,8 +24,8 @@ watch(
 const updateTask = () => {
   router.put(route('tasks.update', localTask.value.id), localTask.value, {
     onSuccess: () => {
-      emit('close')  
-      emit('updated', localTask.value)
+      emit('close')      
+      localTask.value = {}
     }
   })
 }

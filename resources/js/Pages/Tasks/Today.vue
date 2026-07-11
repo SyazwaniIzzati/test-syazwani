@@ -94,7 +94,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, watch, onMounted, onUnmounted } from 'vue';
 import { router as Inertia } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import Header from '@/Components/Header.vue';
@@ -108,15 +108,19 @@ const props = defineProps({
 const taskList = ref([...props.tasks]);
 
 const handleTaskUpdate = (updatedTask) => {
-    const index = props.tasks.findIndex(t => t.id === updatedTask.id)
+    const index = taskList.value.findIndex(t => t.id === updatedTask.id)
     if (index !== -1) {
-        props.tasks[index] = { ...updatedTask }
+        taskList.value[index] = { ...updatedTask }
     }
 }
 
 // Reactive "now" so expired state updates live without a page refresh
 const now = ref(new Date());
 let clockInterval = null;
+
+watch(() => props.tasks, (newTasks) => {
+  taskList.value = [...newTasks];
+});
 
 onMounted(() => {
   clockInterval = setInterval(() => {
