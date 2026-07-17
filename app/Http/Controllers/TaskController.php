@@ -217,4 +217,14 @@ class TaskController extends Controller
             'tasks' => $tasks
         ]);
     }
+
+    public function calendar()
+{
+    $tasks = Task::where('user_id', Auth::id())
+        ->get();
+
+    return Inertia::render('Calendar', [
+        'tasks' => $tasks
+    ]);
+}
 }

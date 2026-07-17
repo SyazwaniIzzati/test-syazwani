@@ -33,6 +33,9 @@ const sidebarOpen = ref(false);
           <li>
             <NavLink :href="route('tasks.past')" :active="route().current('tasks.past')">Past Tasks </NavLink>
           </li>
+          <li>
+            <NavLink :href="route('calendar')" :active="route().current('calendar')">Calendar</NavLink>
+          </li>
         </ul>
       </div>
     </aside>
@@ -62,6 +65,10 @@ const sidebarOpen = ref(false);
           <li>
             <NavLink :href="route('tasks.past')" :active="route().current('tasks.past')"
               @click="sidebarOpen = false">Past Tasks </NavLink>
+          </li>
+          <li>
+            <NavLink :href="route('calendar')" :active="route().current('calendar')"
+              @click="sidebarOpen = false">Calendar</NavLink>
           </li>
         </ul>
       </div>

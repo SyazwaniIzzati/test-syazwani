@@ -35,6 +35,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/tasks/{task}/complete', [TaskController::class, 'markComplete'])->name('tasks.complete');
     Route::get('/tasks/past', [TaskController::class, 'pastTasks'])->name('tasks.past');
     Route::get('/dashboard', [TaskController::class, 'dashboard'])->name('dashboard');
+    Route::get('/calendar', [TaskController::class, 'calendar'])->name('calendar');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
